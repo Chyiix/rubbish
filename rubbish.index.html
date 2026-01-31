@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>情侣反馈板</title>
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+  background: #1e1e1f; /* Notion 深色背景 */
+  color: #f0e6e6;
+}
+
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: left;
+  color: #e0d6d6;
+}
+
+/* 卡片样式 */
+.entry-card {
+  background: #2b2628;
+  padding: 16px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* 删除按钮 */
+.delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #7a6264;
+  color: #f0e6e6;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+/* 标签 */
+.label {
+  display: inline-block;
+  background: #5a484a;
+  color: #f0e6e6;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+/* 文本区域 */
+textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: #3a3235;
+  color: #f0e6e6;
+  font-size: 14px;
+  resize: vertical;
+}
+
+/* 添加新条目按钮 */
+.add-btn {
+  background: #5a484a;
+  color: #f0e6e6;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <h2>💌 最近观察到的小点</h2>
+  
+  <div id="entries"></div>
+  
+  <button class="add-btn" onclick="addEntry()">+ 添加条目</button>
+</div>
+
+<script>
+function createEntry(text='', improve='') {
+  const container = document.createElement('div');
+  container.className = 'entry-card';
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'delete-btn';
+  deleteBtn.textContent = '×';
+  deleteBtn.onclick = () => {
+    container.remove();
+    saveEntries();
+  };
+  
+  const label = document.createElement('div');
+  label.className = 'label';
+  label.textContent = '观察点';
+  
+  const textArea = document.createElement('textarea');
+  textArea.placeholder = '写下你观察到的变化或忽略的点...';
+  textArea.value = text;
+  textArea.oninput = saveEntries;
+  
+  const improveLabel = document.createElement('div');
+  improveLabel.className = 'label';
+  improveLabel.style.marginTop = '8px';
+  improveLabel.textContent = '改进空间';
+  
+  const improveArea = document.createElement('textarea');
+  improveArea.placeholder = '写下你希望如何改进或一起做的事情...';
+  improveArea.value = improve;
+  improveArea.oninput = saveEntries;
+  
+  container.appendChild(deleteBtn);
+  container.appendChild(label);
+  container.appendChild(textArea);
+  container.appendChild(improveLabel);
+  container.appendChild(improveArea);
+  
+  document.getElementById('entries').appendChild(container);
+}
+
+// 添加新条目
+function addEntry() {
+  createEntry();
+  saveEntries();
+}
+
+// 本地存储
+function saveEntries() {
+  const data = [];
+  document.querySelectorAll('.entry-card').forEach(card => {
+    const texts = card.querySelectorAll('textarea');
+    data.push({text: texts[0].value, improve: texts[1].value});
+  });
+  localStorage.setItem('coupleBoard', JSON.stringify(data));
+}
+
+// 读取存储
+function loadEntries() {
+  const data = JSON.parse(localStorage.getItem('coupleBoard') || '[]');
+  data.forEach(item => createEntry(item.text, item.improve));
+}
+
+// 初始化
+loadEntries();
+</script>
+</body>
+</html>
